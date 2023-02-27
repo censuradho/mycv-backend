@@ -1,0 +1,201 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator erd {
+  provider = "prisma-erd-generator"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id
+  
+  username String
+  email String @unique
+  password String
+  role String
+
+  avatar Avatar?
+  curriculum Curriculum?
+
+  @@index([username], type: Hash)
+  @@map("users")
+}
+
+model Curriculum {
+  id String @id
+  views Int @default(0)
+  searchable Boolean @default(true)
+  civil_state String
+  title String
+  presentation String
+  phone String
+  public_email String
+  contact_preference String
+  first_name String
+  last_name String
+  is_pcd Boolean @default(false)
+  
+  user  User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id String @unique
+
+  slug String @unique
+
+  educations Education[]
+  languages Language[]
+  experiences Experience[]
+  portfolios Portfolio[]
+  links Link[]
+  skills Skill[]
+
+  address Address?
+
+  
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  @@index([public_email], type: Hash)
+  @@map("curriculums")
+}
+
+model Education {
+  id String @id
+  
+  curriculum  Curriculum @relation(fields: [curriculum_id], references: [id], onDelete: Cascade)
+  curriculum_id String
+
+  level String
+  institution_name String
+  situation String
+  title String
+
+  description String?
+  
+  initial_date DateTime
+  final_date DateTime?
+
+  is_main Boolean @default(false)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  @@map("educations")
+}
+
+model Experience {
+  id String @id
+
+  employer String
+  title String
+  
+  initial_date DateTime
+  final_date DateTime?
+
+  is_main Boolean @default(false)
+
+  description String? @db.Char(500)
+
+  curriculum  Curriculum @relation(fields: [curriculum_id], references: [id], onDelete: Cascade)
+  curriculum_id String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  @@map("experiences")
+}
+
+model Language {
+  id String @id
+
+  name String
+  conversation String
+  reading String
+  writing String
+  
+  curriculum  Curriculum @relation(fields: [curriculum_id], references: [id], onDelete: Cascade)
+  curriculum_id String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  @@index([name], type: Hash)
+  @@map("languages")
+}
+
+model Skill {
+  id String @id
+
+  name String
+
+  curriculum  Curriculum @relation(fields: [curriculum_id], references: [id], onDelete: Cascade)
+  curriculum_id String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  @@map("skills")
+}
+
+model Link {
+  id String @id
+
+  name String
+  description String? @db.Char(500)
+  icon String
+  href String
+
+  curriculum  Curriculum @relation(fields: [curriculum_id], references: [id], onDelete: Cascade)
+  curriculum_id String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  @@map("links")
+}
+
+model Portfolio {
+  id String @id
+
+  name String
+  link String
+  icon String
+  description String? @db.Char(500)
+
+  
+  curriculum  Curriculum @relation(fields: [curriculum_id], references: [id], onDelete: Cascade)
+  curriculum_id String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  @@map("portfolios")
+}
+
+model Avatar {
+  id String @id
+  width Float
+  height Float
+  url String
+  format String?
+  user User? @relation(fields: [user_id], references: [id])
+  user_id String? @unique
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  @@map("files")
+}
+
+model Address {
+  id String @id
+
+  curriculum  Curriculum @relation(fields: [curriculum_id], references: [id], onDelete: Cascade)
+  curriculum_id String @unique
+
+  country String
+  city String
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  @@index([country, city])
+
+  @@map("addresses")
+}
