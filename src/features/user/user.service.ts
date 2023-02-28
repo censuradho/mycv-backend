@@ -47,6 +47,11 @@ export class UserService {
       },
       include: {
         avatar: true,
+        curriculum: {
+          select: {
+            slug: true,
+          },
+        },
       },
     })
   }
