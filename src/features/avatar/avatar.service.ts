@@ -10,7 +10,7 @@ export class AvatarService {
   ) {}
 
   async upload(file: Express.Multer.File, userId: string) {
-    const avatarExist = await this.findByUser(userId)
+    const avatarExist = await this.findUserById(userId)
 
     if (avatarExist) {
       await this.destroy([avatarExist.id])
@@ -34,7 +34,7 @@ export class AvatarService {
     })
   }
 
-  async findByUser(userId: string) {
+  async findUserById(userId: string) {
     return this.prisma.avatar.findUnique({
       where: {
         user_id: userId,
