@@ -65,8 +65,8 @@ export class CurriculumController {
     return await this.service.findAllSkillsByName(name)
   }
 
-  @Delete('curriculum/avatar')
-  async destroyAvatar () {
-    return await this.destroyAvatar()
+  @Delete('avatar')
+  async destroyAvatar() {
+    return await this.service.destroyAvatar()
   }
 }

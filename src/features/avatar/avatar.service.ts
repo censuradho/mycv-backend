@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/database/prisma.service'
+import { ForbiddenException } from 'src/decorators/errors'
 import { CloudinaryService } from '../cloudinary/cloudinary.service'
+import { AVATAR_ERRORS } from './errors'
 
 @Injectable()
 export class AvatarService {
@@ -44,12 +46,25 @@ export class AvatarService {
 
   async destroy(public_ids: string[]) {
     try {
-      await Promise.all([
-        this.cloudnary.destroyFiles(public_ids),
+      const existAvatar = await this.prisma.avatar.findMany({
+        where: {
+          user_id: {
+            in: public_ids,
+          },
+        },
+      })
+
+      if (!existAvatar || existAvatar.length === 0)
+        throw new ForbiddenException(AVATAR_ERRORS.NOT_FOUND)
+
+      const idsToDelete = existAvatar.map((value) => value.id)
+
+      const [...rest] = await Promise.all([
+        this.cloudnary.destroyFiles(idsToDelete),
         this.prisma.avatar.deleteMany({
           where: {
             id: {
-              in: public_ids,
+              in: idsToDelete,
             },
           },
         }),
