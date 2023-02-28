@@ -45,6 +45,9 @@ export class UserService {
       where: {
         email,
       },
+      include: {
+        avatar: true,
+      },
     })
   }
 }
