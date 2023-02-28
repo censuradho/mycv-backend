@@ -7,6 +7,7 @@ import {
   UseInterceptors,
   Param,
   Put,
+  Delete,
 } from '@nestjs/common'
 import { UploadedFile } from '@nestjs/common/decorators/http/route-params.decorator'
 import { FileInterceptor } from '@nestjs/platform-express'
@@ -62,5 +63,10 @@ export class CurriculumController {
   @Get('skills')
   async findAllSkillsByName(@Query('name') name: string) {
     return await this.service.findAllSkillsByName(name)
+  }
+
+  @Delete('curriculum/avatar')
+  async destroyAvatar () {
+    return await this.destroyAvatar()
   }
 }

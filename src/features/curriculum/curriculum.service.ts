@@ -581,4 +581,16 @@ export class CurriculumService {
       },
     })
   }
+
+  async destroyAvatar () {
+    const avatar = await this.prisma.avatar.findUnique({
+      where: {
+        user_id: this.request.user.id
+      }
+    })
+
+    if (!avatar) return;
+
+    await this.avatar.destroy([avatar.id])
+  }
 }
