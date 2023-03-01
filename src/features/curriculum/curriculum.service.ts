@@ -604,6 +604,13 @@ export class CurriculumService {
     const results = await this.prisma.curriculum.findMany({
       skip: page - 1,
       take,
+      include: {
+        user: {
+          select: {
+            avatar: true,
+          },
+        },
+      },
       where: {
         OR: [
           {
