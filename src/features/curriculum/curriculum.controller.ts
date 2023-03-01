@@ -44,6 +44,12 @@ export class CurriculumController {
   }
 
   @IsPublic()
+  @Get('profiles')
+  async findProfiles(@Query() query: QueryDto) {
+    return await this.service.findProfiles(query)
+  }
+
+  @IsPublic()
   @Get(':slug')
   async findBySlug(@Param('slug') id: string) {
     return await this.service.findBySlug(id)
@@ -58,11 +64,6 @@ export class CurriculumController {
   @UseInterceptors(FileInterceptor('file'))
   uploadFile(@UploadedFile() file: Express.Multer.File) {
     return this.service.avatarUpload(file)
-  }
-
-  @Get('skills')
-  async findAllSkillsByName(@Query('name') name: string) {
-    return await this.service.findAllSkillsByName(name)
   }
 
   @Delete('avatar')

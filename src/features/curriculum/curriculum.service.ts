@@ -3,6 +3,7 @@ import { REQUEST } from '@nestjs/core'
 import { randomUUID } from 'crypto'
 import { PrismaService } from 'src/database/prisma.service'
 import { ForbiddenException } from 'src/decorators/errors'
+import { PaginationDto } from 'src/dto/pagination.dto'
 import { slugify } from 'src/utils/slugfy'
 import { AuthRequest } from '../auth/models'
 import { AvatarService } from '../avatar/avatar.service'
@@ -587,17 +588,71 @@ export class CurriculumService {
     await this.avatar.upload(file, this.request.user.id)
   }
 
-  async findAllSkillsByName(name: string) {
-    return await this.prisma.skill.findMany({
-      where: {
-        name: {
-          startsWith: name,
-        },
-      },
-    })
-  }
-
   async destroyAvatar() {
     await this.avatar.destroy([this.request.user.id])
+  }
+
+  async findProfiles(query: QueryDto) {
+    const { page: queryPage = 1, q = '' } = query
+
+    const count = await this.prisma.curriculum.count()
+    const take = 10
+
+    const page = Number(queryPage)
+    const totalPages = count / take
+
+    const results = await this.prisma.curriculum.findMany({
+      skip: page - 1,
+      take,
+      where: {
+        OR: [
+          {
+            address: {
+              OR: [
+                {
+                  city: {
+                    contains: q,
+                  },
+                },
+                {
+                  country: {
+                    contains: q,
+                  },
+                },
+              ],
+            },
+          },
+          {
+            public_email: {
+              contains: q,
+            },
+          },
+          {
+            title: {
+              contains: q,
+            },
+          },
+          {
+            first_name: {
+              contains: q,
+            },
+          },
+          {
+            last_name: {
+              contains: q.split(' ')[1],
+            },
+          },
+        ],
+      },
+    })
+
+    const parsedData = new PaginationDto(results, {
+      count,
+      page,
+      take,
+      totalPages,
+    })
+
+    return parsedData
   }
 }
