@@ -593,25 +593,63 @@ export class CurriculumService {
   }
 
   async findProfiles(query: QueryDto) {
-    const { page: queryPage = 1, q = '' } = query
+    const { q = '', take = 10 } = query
 
-    const count = await this.prisma.curriculum.count()
-    const take = 10
+    const where = {
+      OR: [
+        {
+          address: {
+            OR: [
+              {
+                city: {
+                  contains: q,
+                },
+              },
+              {
+                country: {
+                  contains: q,
+                },
+              },
+            ],
+          },
+        },
+        {
+          public_email: {
+            contains: q,
+          },
+        },
+        {
+          title: {
+            contains: q,
+          },
+        },
+        {
+          first_name: {
+            contains: q,
+          },
+        },
+        {
+          last_name: {
+            contains: q.split(' ')[1],
+          },
+        },
+      ],
+    }
 
-    const page = Number(queryPage)
-    const totalPages = count / take
+    const count = await this.prisma.curriculum.count({
+      where,
+    })
 
     if (!q)
       return new PaginationDto([], {
         count: 0,
-        page,
         take,
-        totalPages: 0,
       })
 
+    const _taken = take > count ? count : take
+
     const results = await this.prisma.curriculum.findMany({
-      skip: page - 1,
-      take,
+      take: _taken,
       include: {
         address: true,
         user: {
@@ -620,53 +658,12 @@ export class CurriculumService {
           },
         },
       },
-      where: {
-        OR: [
-          {
-            address: {
-              OR: [
-                {
-                  city: {
-                    contains: q,
-                  },
-                },
-                {
-                  country: {
-                    contains: q,
-                  },
-                },
-              ],
-            },
-          },
-          {
-            public_email: {
-              contains: q,
-            },
-          },
-          {
-            title: {
-              contains: q,
-            },
-          },
-          {
-            first_name: {
-              contains: q,
-            },
-          },
-          {
-            last_name: {
-              contains: q.split(' ')[1],
-            },
-          },
-        ],
-      },
+      where,
     })
 
     const parsedData = new PaginationDto(results, {
       count,
-      page,
       take,
-      totalPages,
     })
 
     return parsedData

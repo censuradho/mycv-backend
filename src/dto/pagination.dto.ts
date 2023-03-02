@@ -2,16 +2,10 @@ import { IsArray, IsNumber, ValidateNested } from 'class-validator'
 
 export class PageMetaDto {
   @IsNumber()
-  page: number
-
-  @IsNumber()
   count: number
 
   @IsNumber()
   take: number
-
-  @IsNumber()
-  totalPages
 }
 
 export class PaginationDto<T> {

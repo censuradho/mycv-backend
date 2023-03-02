@@ -10,4 +10,9 @@ export class QueryDto {
   @Type(() => Number)
   @IsNumber()
   page: number
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  take: number
 }
