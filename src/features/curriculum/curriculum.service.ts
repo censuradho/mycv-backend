@@ -601,10 +601,19 @@ export class CurriculumService {
     const page = Number(queryPage)
     const totalPages = count / take
 
+    if (!q)
+      return new PaginationDto([], {
+        count: 0,
+        page,
+        take,
+        totalPages: 0,
+      })
+
     const results = await this.prisma.curriculum.findMany({
       skip: page - 1,
       take,
       include: {
+        address: true,
         user: {
           select: {
             avatar: true,
