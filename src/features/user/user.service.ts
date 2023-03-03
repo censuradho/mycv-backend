@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/database/prisma.service'
 import { CreateUserDto } from './dto/create'
 import * as bcrypt from 'bcrypt'
@@ -6,10 +6,16 @@ import { randomUUID } from 'crypto'
 import { Role } from './model/roles'
 import { ForbiddenException } from 'src/decorators/errors'
 import { USER_ERRORS } from './errors'
+import { UpdateUserDto } from './dto/update'
+import { AuthRequest } from '../auth/models'
+import { REQUEST } from '@nestjs/core'
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(REQUEST) private readonly request: AuthRequest
+  ) {}
 
   async create(payload: CreateUserDto) {
     const { email, username, password } = payload
@@ -52,6 +58,25 @@ export class UserService {
             slug: true,
           },
         },
+      },
+    })
+  }
+
+  async update(payload: UpdateUserDto) {
+    const existUser = await this.prisma.user.findFirst({
+      where: {
+        id: this.request.user.id,
+      },
+    })
+
+    if (!existUser) throw new ForbiddenException(USER_ERRORS.USER_NOT_FOUND)
+
+    await this.prisma.user.update({
+      where: {
+        id: this.request.user.id,
+      },
+      data: {
+        username: payload.username,
       },
     })
   }
