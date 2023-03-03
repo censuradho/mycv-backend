@@ -59,7 +59,7 @@ export class AvatarService {
 
       const idsToDelete = existAvatar.map((value) => value.id)
 
-      const [...rest] = await Promise.all([
+      await Promise.all([
         this.cloudnary.destroyFiles(idsToDelete),
         this.prisma.avatar.deleteMany({
           where: {
