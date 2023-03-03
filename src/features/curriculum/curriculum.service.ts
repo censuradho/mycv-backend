@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { REQUEST } from '@nestjs/core'
+import { Prisma } from '@prisma/client'
 import { randomUUID } from 'crypto'
 import { PrismaService } from 'src/database/prisma.service'
 import { ForbiddenException } from 'src/decorators/errors'
@@ -595,6 +596,8 @@ export class CurriculumService {
   async findProfiles(query: QueryDto) {
     const { q = '', take = 10 } = query
 
+    const mode: Prisma.QueryMode = 'insensitive'
+
     const where = {
       OR: [
         {
@@ -603,11 +606,13 @@ export class CurriculumService {
               {
                 city: {
                   contains: q,
+                  mode,
                 },
               },
               {
                 country: {
                   contains: q,
+                  mode,
                 },
               },
             ],
@@ -616,21 +621,25 @@ export class CurriculumService {
         {
           public_email: {
             contains: q,
+            mode,
           },
         },
         {
           title: {
             contains: q,
+            mode,
           },
         },
         {
           first_name: {
             contains: q,
+            mode,
           },
         },
         {
           last_name: {
             contains: q.split(' ')[1],
+            mode,
           },
         },
       ],
