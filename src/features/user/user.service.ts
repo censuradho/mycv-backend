@@ -61,23 +61,4 @@ export class UserService {
       },
     })
   }
-
-  async update(payload: UpdateUserDto) {
-    const existUser = await this.prisma.user.findFirst({
-      where: {
-        id: this.request.user.id,
-      },
-    })
-
-    if (!existUser) throw new ForbiddenException(USER_ERRORS.USER_NOT_FOUND)
-
-    await this.prisma.user.update({
-      where: {
-        id: this.request.user.id,
-      },
-      data: {
-        username: payload.username,
-      },
-    })
-  }
 }

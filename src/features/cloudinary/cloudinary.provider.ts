@@ -5,7 +5,6 @@ import { CLOUDINARY } from './constants'
 export const CloudinaryProvider = {
   provide: CLOUDINARY,
   useFactory: () => {
-    console.log(environments.cloudinary)
     return v2.config({
       cloud_name: environments.cloudinary.name,
       api_key: '856474167273563',
