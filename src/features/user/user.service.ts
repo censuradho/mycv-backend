@@ -1,21 +1,15 @@
-import { Inject, Injectable } from '@nestjs/common'
-import { PrismaService } from 'src/database/prisma.service'
-import { CreateUserDto } from './dto/create'
+import { Injectable } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
 import { randomUUID } from 'crypto'
-import { Role } from './model/roles'
+import { PrismaService } from 'src/database/prisma.service'
 import { ForbiddenException } from 'src/decorators/errors'
+import { CreateUserDto } from './dto/create'
 import { USER_ERRORS } from './errors'
-import { UpdateUserDto } from './dto/update'
-import { AuthRequest } from '../auth/models'
-import { REQUEST } from '@nestjs/core'
+import { Role } from './model/roles'
 
 @Injectable()
 export class UserService {
-  constructor(
-    private readonly prisma: PrismaService,
-    @Inject(REQUEST) private readonly request: AuthRequest
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(payload: CreateUserDto) {
     const { email, username, password } = payload
