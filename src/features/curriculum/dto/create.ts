@@ -99,6 +99,7 @@ export class Education {
   @IsDateString()
   initial_date: string
 
+  @IsOptional()
   @IsDateString()
   final_date: string
 
