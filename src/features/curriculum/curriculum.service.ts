@@ -501,9 +501,10 @@ export class CurriculumService {
   }
 
   async findBySlug(slug: string) {
-    return this.prisma.curriculum.findUnique({
+    return this.prisma.curriculum.findFirst({
       where: {
         slug,
+        searchable: true,
       },
       include: {
         address: true,
@@ -525,6 +526,7 @@ export class CurriculumService {
   async findMany(query?: QueryDto) {
     return await this.prisma.curriculum.findMany({
       where: {
+        searchable: true,
         ...(query?.q && {
           OR: [
             {
@@ -599,6 +601,7 @@ export class CurriculumService {
     const mode: Prisma.QueryMode = 'insensitive'
 
     const where = {
+      searchable: true,
       OR: [
         {
           address: {
