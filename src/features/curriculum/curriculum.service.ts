@@ -485,8 +485,16 @@ export class CurriculumService {
       },
       include: {
         address: true,
-        educations: true,
-        experiences: true,
+        educations: {
+          orderBy: {
+            initial_date: 'desc',
+          },
+        },
+        experiences: {
+          orderBy: {
+            initial_date: 'desc',
+          },
+        },
         languages: true,
         links: true,
         portfolios: true,
@@ -508,8 +516,16 @@ export class CurriculumService {
       },
       include: {
         address: true,
-        educations: true,
-        experiences: true,
+        educations: {
+          orderBy: {
+            initial_date: 'desc',
+          },
+        },
+        experiences: {
+          orderBy: {
+            initial_date: 'desc',
+          },
+        },
         languages: true,
         links: true,
         portfolios: true,
@@ -649,7 +665,9 @@ export class CurriculumService {
     }
 
     const count = await this.prisma.curriculum.count({
-      where,
+      where: {
+        ...where,
+      },
     })
 
     if (!q)
