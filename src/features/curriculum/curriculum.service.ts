@@ -434,7 +434,7 @@ export class CurriculumService {
   }
 
   async findBySlug(slug: string) {
-    return this.prisma.curriculum.findFirst({
+    const result = await this.prisma.curriculum.findFirst({
       where: {
         slug,
         searchable: true,
@@ -462,6 +462,18 @@ export class CurriculumService {
         },
       },
     })
+
+    if (result) {
+      await this.prisma.curriculum.update({
+        where: {
+          slug,
+        },
+        data: {
+          views: (result.views += 1),
+        },
+      })
+    }
+    return result
   }
 
   async findMany(query?: QueryDto) {
