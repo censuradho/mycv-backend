@@ -161,130 +161,55 @@ export class CurriculumService {
       portfoliosToDelete,
     } = payload
 
-    const curriculumExist = await this.prisma.curriculum.findFirst({
+    await this.prisma.curriculum.update({
       where: {
-        AND: [
-          { id },
-          linksToDelete && {
-            links: {
-              every: {
-                id: {
-                  in: linksToDelete,
-                },
-              },
+        id,
+      },
+      data: {
+        ...(educationsToDelete && {
+          educations: {
+            deleteMany: {
+              AND: educationsToDelete.map((value) => ({ id: value })),
             },
           },
-          skillsToDelete && {
-            skills: {
-              every: {
-                id: {
-                  in: skillsToDelete,
-                },
-              },
+        }),
+        ...(portfoliosToDelete && {
+          portfolios: {
+            deleteMany: {
+              AND: portfoliosToDelete.map((value) => ({ id: value })),
             },
           },
-          languagesToDelete && {
-            languages: {
-              every: {
-                id: {
-                  in: languagesToDelete,
-                },
-              },
+        }),
+        ...(languagesToDelete && {
+          languages: {
+            deleteMany: {
+              AND: languagesToDelete.map((value) => ({ id: value })),
             },
           },
-          educationsToDelete && {
-            educations: {
-              every: {
-                id: {
-                  in: educationsToDelete,
-                },
-              },
+        }),
+        ...(linksToDelete && {
+          links: {
+            deleteMany: {
+              AND: linksToDelete.map((value) => ({ id: value })),
             },
           },
-          experiencesToDelete && {
-            experiences: {
-              every: {
-                id: {
-                  in: experiencesToDelete,
-                },
-              },
+        }),
+        ...(experiencesToDelete && {
+          experiences: {
+            deleteMany: {
+              AND: experiencesToDelete.map((value) => ({ id: value })),
             },
           },
-          portfoliosToDelete && {
-            portfolios: {
-              every: {
-                id: {
-                  in: portfoliosToDelete,
-                },
-              },
+        }),
+        ...(skillsToDelete && {
+          skills: {
+            deleteMany: {
+              AND: skillsToDelete.map((value) => ({ id: value })),
             },
           },
-        ].filter((value) => value),
+        }),
       },
     })
-
-    if (!curriculumExist)
-      throw new ForbiddenException(CURRICULUM_ERRORS.CURRICULUM_NOT_FOUND)
-
-    if (linksToDelete) {
-      await this.prisma.$transaction(
-        linksToDelete.map((value) =>
-          this.prisma.link.delete({
-            where: { id: value },
-          })
-        )
-      )
-    }
-
-    if (skillsToDelete) {
-      await this.prisma.$transaction(
-        skillsToDelete.map((value) =>
-          this.prisma.skill.delete({
-            where: { id: value },
-          })
-        )
-      )
-    }
-
-    if (languagesToDelete) {
-      await this.prisma.$transaction(
-        languagesToDelete.map((value) =>
-          this.prisma.language.delete({
-            where: { id: value },
-          })
-        )
-      )
-    }
-
-    if (educationsToDelete) {
-      await this.prisma.$transaction(
-        educationsToDelete.map((value) =>
-          this.prisma.education.delete({
-            where: { id: value },
-          })
-        )
-      )
-    }
-
-    if (experiencesToDelete) {
-      await this.prisma.$transaction(
-        experiencesToDelete.map((value) =>
-          this.prisma.experience.delete({
-            where: { id: value },
-          })
-        )
-      )
-    }
-
-    if (portfoliosToDelete) {
-      await this.prisma.$transaction(
-        portfoliosToDelete.map((value) =>
-          this.prisma.portfolio.delete({
-            where: { id: value },
-          })
-        )
-      )
-    }
 
     await this.prisma.$transaction([
       this.prisma.curriculum.update({
