@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Post,
   Request,
@@ -46,5 +47,10 @@ export class AuthController {
     }
 
     return rest
+  }
+
+  @Delete()
+  async deleteAccount(@CurrentUser() user: User) {
+    return await this.service.deleteAccount(user.id)
   }
 }

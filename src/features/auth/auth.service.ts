@@ -65,4 +65,8 @@ export class AuthService {
   async SignUp(payload: CreateUserDto) {
     return await this.userService.create(payload)
   }
+
+  async deleteAccount(userId: string) {
+    return await this.userService.delete(userId)
+  }
 }
